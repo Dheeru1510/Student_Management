@@ -1,8 +1,8 @@
 using BusinessModel.Abstraction;
 using BusinessModel.Implementation;
-using System.Web.Mvc;
+using System.Web.Http;
 using Unity;
-using Unity.Mvc5;
+using Unity.WebApi;
 
 namespace Student_Management
 {
@@ -16,7 +16,9 @@ namespace Student_Management
             // it is NOT necessary to register your controllers
 
             container.RegisterType<IUsersBO, UsersBo>();
-            DependencyResolver.SetResolver(new UnityDependencyResolver(container));
+            container.RegisterType<IStudentDetailBO, StudentDetailBO>();
+
+            GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
     }
 }

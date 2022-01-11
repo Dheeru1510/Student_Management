@@ -1,4 +1,4 @@
-﻿using BusinessModel.Implementation;
+﻿using BusinessModel.Abstraction;
 using EntityModel.StudentEntity;
 using EntityModel.UserEntity;
 using Student_Management.Common;
@@ -13,6 +13,11 @@ namespace Student_Management.Controllers
     [BasicAuthentication]
     public class StudentController : ApiController
     {
+        private IStudentDetailBO _objStudentDetailBO = null;
+        public StudentController(IStudentDetailBO obj)
+        {
+            _objStudentDetailBO = obj;
+        }
         [HttpPost]
         [Route("api/SaveStudent")]
         public Object SaveStudentDetails([FromBody] StudentDetails data)
@@ -24,7 +29,7 @@ namespace Student_Management.Controllers
                     data.UID = new Guid(UserInfo.Uid);
                 data.CreatedOn = DateTime.Now;
                 data.CreatedBy = -1;
-                var res = new StudentDetailBO().InsertStudentDetail(data);
+                var res = _objStudentDetailBO.InsertStudentDetail(data);
                 if (res > 0)
                 {
                     return ControllerContext.Request.CreateResponse(HttpStatusCode.OK, new { status = HttpStatusCode.OK, message = "Information saved successfully" });
@@ -61,7 +66,7 @@ namespace Student_Management.Controllers
                 {
                     data.LastModifiedOn = DateTime.Now;
                     data.LastModifiedBy = -2;
-                    var res = new StudentDetailBO().UpdateStudentDetail(data);
+                    var res = _objStudentDetailBO.UpdateStudentDetail(data);
                     if (res > 0)
                     {
                         msg = "Information updated successfully";
@@ -98,7 +103,7 @@ namespace Student_Management.Controllers
             try
             {
                 FileLogger.Log("Start GetAllStudent-- get all student records");
-                var lst = new StudentDetailBO().GetAllDeails();
+                var lst = _objStudentDetailBO.GetAllDeails();
                 if (lst.Count > 0)
                 {
                     return ControllerContext.Request.CreateResponse(HttpStatusCode.OK, new { status = HttpStatusCode.OK, message = "Total records-" + lst.Count, data = lst });
@@ -126,7 +131,7 @@ namespace Student_Management.Controllers
             try
             {
                 FileLogger.Log("Start GetStudentByID-- get student records");
-                var objStudentDetail = new StudentDetailBO().GetStudentByID(id);
+                var objStudentDetail = _objStudentDetailBO.GetStudentByID(id);
                 if (objStudentDetail != null)
                 {
                     return ControllerContext.Request.CreateResponse(HttpStatusCode.OK, new { status = HttpStatusCode.OK, data = objStudentDetail });
@@ -154,7 +159,7 @@ namespace Student_Management.Controllers
             try
             {
                 FileLogger.Log("Start DeleteStudent-- delete student detail");
-                var res = new StudentDetailBO().DeleteStudent(id);
+                var res = _objStudentDetailBO.DeleteStudent(id);
                 if (res > 0)
                 {
                     return ControllerContext.Request.CreateResponse(HttpStatusCode.OK, new { status = HttpStatusCode.OK, message = "Information deleted successfully!" });
